@@ -1,0 +1,25 @@
+
+[package]
+authors = ["LongYinan <lynweklm@gmail.com>"]
+edition = "2021"
+name = "macros_engine"
+version = "0.1.0"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+napi = "3.0.0"
+napi-derive = "3.0.0"
+rusqlite = "0.31"
+
+[build-dependencies]
+napi-build = "2"
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+strip = "symbols"
+incremental = false
