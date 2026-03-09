@@ -10,7 +10,7 @@ const OPT = {
     port: parseInt(process.env.PORT),
     username: process.env.NAME,
     version: process.env.VERSION,
-    checkTimeoutInterval: 45000
+    checkTimeoutInterval: 90000
 };
 
 const PASSWORD = process.env.PASSWORD;
@@ -40,7 +40,7 @@ function safeRestart(delay = 5000) {
     isReady = false;
     if (bot) { try { bot.quit(); } catch(e) {} bot = null; }
     if (watchdogInterval) { clearInterval(watchdogInterval); watchdogInterval = null; }
-    log(`Reiniciando em ${delay / 1000}s...`);
+    log(`Reiniciando: ${delay / 1000}s...`);
     reconnectTimer = setTimeout(() => { reconnectTimer = null; startBot(); }, delay);
 }
 
@@ -118,7 +118,7 @@ rl.on('line', async (line) => {
     if (input === 'c') { if (!isConnected) startBot(); return rl.prompt(); }
 
     if (!bot || !isConnected || !isReady) {
-        log('Aguarde o bot estabilizar...');
+        log('Aguarde...');
         return rl.prompt();
     }
 
