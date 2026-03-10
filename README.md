@@ -34,19 +34,25 @@ npm run build
 - macro <add|del|list> nome exe
 
 • macro add → adicionar
+
 • macro del → deletar
+
 • macro list → lista suas macros
- exemplo: macro add tp /tpa Nevisk
+
+  exemplo: macro add tp /tpa Nevisk
 
  Uso normal no cmd: > `tp`
+
  = executa o comando da {tp}!
 
 ### Leave & Enter ¢
 
 - No cmd: > `c`
+
  = tenta conecta manualmente.
 
 - No cmd: > `q`
+
  = encerra totalmente o bot.
 
 #### Faz o L
