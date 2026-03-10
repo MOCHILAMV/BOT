@@ -29,7 +29,7 @@ npm run build
   PORT=porta (padrão? 25565).
   VERSION=1.19.4 (melhor vers).
 
-## Macro $
+## Macros $
 
 - macro <add|del|list> nome exe
 
@@ -49,7 +49,7 @@ npm run build
 
 - No cmd: > `c`
 
- = tenta conecta manualmente.
+ = tenta conectar manualmente.
 
 - No cmd: > `q`
 
