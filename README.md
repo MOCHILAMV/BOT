@@ -24,13 +24,9 @@ npm run build
 - Use um editor de texto para criar o `.env`:
 
   NAME=nick (nick offline).
-
   PASSWORD=senha (para login auto).
-
   IP=endereço (prefira ip direto).
-
   PORT=porta (padrão? 25565).
-
   VERSION=1.19.4 (melhor vers).
 
 ### Agora faça o L
