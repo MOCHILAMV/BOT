@@ -1,10 +1,9 @@
 ## Sobre ‹/›
 
-• O bot usa bibliotecas Mineflayer.
+- O bot usa bibliotecas Mineflayer no JS.
+- Usa Rust para macros e SQlite para data.
 
-• Usa Rust para macros e SQlite para data.
-
-## Instalação ↓
+## Instalação §
 
 ¹ Instale pacotes do `nodejs` e `rust`.
 
@@ -22,12 +21,16 @@ npm run build
 
 ## Configuração *
 
-• Use um editor de texto para criar o `.env`:
+- Use um editor de texto para criar o `.env`:
 
--  NAME=nick (nick offline).
--  PASSWORD=senha (para login auto).
--  IP=endereço (prefira ip direto).
--  PORT=porta (padrão? 25565).
--  VERSION=1.19.4 (melhor vers).
+  NAME=nick (nick offline).
+
+  PASSWORD=senha (para login auto).
+
+  IP=endereço (prefira ip direto).
+
+  PORT=porta (padrão? 25565).
+
+  VERSION=1.19.4 (melhor vers).
 
 ### Agora faça o L
