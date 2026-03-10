@@ -9,12 +9,16 @@
 ¹ Instale pacotes do `nodejs` e `rust`.
 
 ² Instale dependências com:
-```npm install```
+```bash
+npm install
+```
 
-³ Compile o binário do napi + lib.rs:
-```npm run build```
+³ Vá para o diretório macros-engine/
 
-  (Precisa estar no macros-engine/).
+⁴ Compile o binário do napi + lib.rs:
+```bash
+npm run build
+```
 
 ## Configuração *
 
