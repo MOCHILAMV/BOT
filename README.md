@@ -12,7 +12,7 @@
 npm install
 ```
 
-³ Vá para o diretório macros-engine/
+³ Vá para o diretório bot-core/
 
 ⁴ Compile o binário do napi + lib.rs:
 ```bash
@@ -28,22 +28,7 @@ npm run build
   IP=endereço (prefira ip direto).
   PORT=porta (padrão? 25565).
   VERSION=1.19.4 (melhor vers).
-
-## Macros 
-
-- macro <add|del|list> nome exe
-
-• macro add → adicionar
-
-• macro del → deletar
-
-• macro list → lista suas macros
-
-  exemplo: macro add tp /tpa Nevisk
-
- Uso normal no cmd: > `tp`
-
- = executa o comando da {tp}!
+  (atualizarei)
 
 ### Leave & Enter 
 
@@ -57,4 +42,4 @@ npm run build
 
 #### F
 
-Mais novidades em breve
+• Mais novidades em breve
