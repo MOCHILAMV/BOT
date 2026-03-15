@@ -1,8 +1,13 @@
 {
   "name": "bot",
-  "version": "1.0.0",
+  "version": "1.4.5",
+  "main": "bot.js",
+  "scripts": {
+    "start": "node bot.js"
+  },
   "dependencies": {
     "dotenv": "^16.0.0",
+    "minecraft-data": "^3.105.0",
     "mineflayer": "^4.0.0",
     "prismarine-auth": "^2.7.0"
   }

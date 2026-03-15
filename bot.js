@@ -1,154 +1,185 @@
-require('dotenv').config();
-const mineflayer = require('mineflayer');
-const readline = require('readline');
-const { MacroEngine } = require('./macros-engine');
+require('dotenv').config()
 
-const engine = new MacroEngine();
+const mineflayer = require('mineflayer')
+const cmd = require('./cmd')
+
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 const OPT = {
-    host: process.env.IP,
-    port: parseInt(process.env.PORT),
-    username: process.env.NAME,
-    version: process.env.VERSION,
-    checkTimeoutInterval: 90000
-};
+  host: process.env.IP,
+  port: Number.parseInt(process.env.PORT, 10),
+  version: process.env.VERSION,
+  checkTimeoutInterval: 100000,
+  viewDistance: 0
+}
 
-const PASSWORD = process.env.PASSWORD;
-const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+const EMAIL = process.env.EMAIL
+const PASSWORD = process.env.PASSWORD
+const NAME = process.env.NAME
+const PASS = process.env.PASS
 
-let bot = null;
-let isConnected = false;
-let isReady = false;
-let reconnectTimer = null;
-let watchdogInterval = null;
+if (EMAIL) {
+  OPT.username = EMAIL
+  OPT.auth = 'microsoft'
+} else {
+  OPT.username = NAME
+}
 
-const rl = readline.createInterface({
-    input: process.stdin, output: process.stdout, prompt: '> '
-});
+let bot = null
+let reconnectTimer = null
+let watchdogInterval = null
 
-const log = (msg) => {
-    if (rl.closed) return;
-    readline.clearLine(process.stdout, 0);
-    readline.cursorTo(process.stdout, 0);
-    process.stdout.write(`${msg}\n`);
-    rl.prompt(true);
-};
+function clearWatchdog() {
+  if (!watchdogInterval) return
+  clearInterval(watchdogInterval)
+  watchdogInterval = null
+}
+
+function destroyBot() {
+  if (!bot) return
+
+  try {
+    bot.quit()
+  } catch {}
+
+  bot = null
+}
 
 function safeRestart(delay = 5000) {
-    if (reconnectTimer) return;
-    isConnected = false;
-    isReady = false;
-    if (bot) { try { bot.quit(); } catch(e) {} bot = null; }
-    if (watchdogInterval) { clearInterval(watchdogInterval); watchdogInterval = null; }
-    log(`Reiniciando: ${delay / 1000}s...`);
-    reconnectTimer = setTimeout(() => { reconnectTimer = null; startBot(); }, delay);
+  if (reconnectTimer) return
+
+  clearWatchdog()
+  destroyBot()
+
+  reconnectTimer = setTimeout(() => {
+    reconnectTimer = null
+    startBot()
+  }, delay)
+}
+
+function setupWatchdog() {
+  clearWatchdog()
+
+  let last = Date.now()
+
+  watchdogInterval = setInterval(() => {
+    const now = Date.now()
+
+    if (now - last - 1000 > 2000) {
+      safeRestart(2000)
+      return
+    }
+
+    last = now
+  }, 1000)
+}
+
+function setupMessageLogger(instance) {
+  instance.on('message', jsonMsg => {
+    try {
+      const msg = jsonMsg.toAnsi()
+
+      if (msg && msg.trim()) {
+        cmd.serverLog(msg)
+      }
+    } catch {}
+  })
+}
+
+function setupErrorHandlers(instance) {
+  instance.on('error', e => {
+    const txt = `Erro: ${e && e.message ? e.message : String(e)}`
+    console.error(txt)
+
+    try {
+      cmd.serverLog(txt)
+    } catch {}
+  })
+
+  instance.on('end', reason => {
+    const txt = `Fim: ${reason}`
+    console.log(txt)
+
+    try {
+      cmd.serverLog(txt)
+    } catch {}
+
+    safeRestart()
+  })
+}
+
+async function reapplyPhysics(instance, delay = 250) {
+  await sleep(delay)
+
+  if (!bot || instance !== bot) return
+
+  try {
+    instance.physicsEnabled = true
+  } catch {}
+
+  try {
+    instance.clearControlStates()
+  } catch {}
+
+  try {
+    instance.setControlState('jump', false)
+    instance.setControlState('forward', false)
+    instance.setControlState('back', false)
+    instance.setControlState('left', false)
+    instance.setControlState('right', false)
+    instance.setControlState('sprint', false)
+  } catch {}
+}
+
+async function handleSpawn(instance) {
+  await reapplyPhysics(instance, 250)
+  await sleep(500)
+
+  cmd.attachBot(instance)
+  setupMessageLogger(instance)
+
+  if (!EMAIL && PASS) {
+    await sleep(100)
+
+    try {
+      instance.chat(`/login ${PASS}`)
+    } catch {}
+  }
+
+  cmd.serverLog('BOT PRONTO.')
+  setupWatchdog()
 }
 
 function startBot() {
-    if (bot) return;
-    bot = mineflayer.createBot(OPT);
+  if (bot) return
 
-    bot.once('spawn', async () => {
-        bot.physicsEnabled = false;
-        isConnected = true;
-        await sleep(500);
-        isReady = true;
+  const instance = mineflayer.createBot(OPT)
+  bot = instance
 
-        bot.on('message', (jsonMsg) => {
-            const msg = jsonMsg.toAnsi();
-            if (msg.trim().length === 0) return;
-            log(`${msg}`);
-        });
+  instance.once('spawn', async () => {
+    try {
+      await handleSpawn(instance)
+    } catch (e) {
+      const txt = `Erro no spawn: ${e && e.message ? e.message : String(e)}`
+      console.error(txt)
 
-        if (PASSWORD) {
-            await sleep(50);
-            bot.chat(`/login ${PASSWORD}`);
-        }
+      try {
+        cmd.serverLog(txt)
+      } catch {}
 
-        log('BOT PRONTO.');
+      safeRestart(2000)
+    }
+  })
 
-        let last = Date.now();
-        watchdogInterval = setInterval(() => {
-            const now = Date.now();
-            if (now - last - 1000 > 2000) safeRestart(2000);
-            last = now;
-        }, 1000);
-    });
+  instance.on('respawn', async () => {
+    try {
+      await reapplyPhysics(instance, 250)
+    } catch {}
+  })
 
-    bot.on('error', (err) => log(`Erro: ${err.message}`));
-    bot.on('end', (reason) => { log(`Fim: ${reason}`); safeRestart(); });
+  setupErrorHandlers(instance)
 }
 
-async function handleMacroCommand(parts) {
-    const sub = parts[1];
+process.on('SIGINT', () => process.exit(0))
 
-    if (sub === 'add') {
-        const name = parts[2];
-        const cmd = parts.slice(3).join(' ');
-        if (!name || !cmd) { log('USO: macro add <nome> <comando>'); return; }
-        engine.add(name, cmd);
-        log(`MACRO ADICIONADA: ${name} => ${cmd}`);
-        return;
-    }
-
-    if (sub === 'del') {
-        const name = parts[2];
-        if (!name) { log('USO: macro del <nome>'); return; }
-        engine.del(name);
-        log(`MACRO REMOVIDA: ${name}`);
-        return;
-    }
-
-    if (sub === 'list') {
-        const list = engine.list();
-        if (!list || list.length === 0) { log('SEM MACROS'); return; }
-        for (const m of list) process.stdout.write(`${m[0]} => ${m[1]}\n`);
-        rl.prompt(true);
-        return;
-    }
-
-    log('USO: macro <add|del|list>');
-}
-
-rl.on('line', async (line) => {
-    const input = line.trim();
-    if (!input) return rl.prompt();
-
-    if (input === 'q') process.exit(0);
-    if (input === 'c') { if (!isConnected) startBot(); return rl.prompt(); }
-
-    if (!bot || !isConnected || !isReady) {
-        log('Aguarde...');
-        return rl.prompt();
-    }
-
-    const parts = input.split(/\s+/);
-
-    if (parts[0] === 'macro') {
-        await handleMacroCommand(parts);
-        rl.prompt();
-        return;
-    }
-
-    if (input.startsWith('/')) {
-        bot.chat(input);
-        rl.prompt();
-        return;
-    }
-
-    const key = parts[0];
-    const cmd = engine.resolve(key);
-
-    if (cmd) {
-        const final = cmd.startsWith('/') ? cmd : `/${cmd}`;
-        bot.chat(final);
-        rl.prompt();
-        return;
-    }
-
-    log('COMANDO DESCONHECIDO');
-    rl.prompt();
-});
-
-process.on('SIGINT', () => process.exit(0));
-startBot();
+startBot()

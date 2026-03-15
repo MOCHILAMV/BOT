@@ -1,0 +1,31 @@
+[package]
+name = "bot_core"
+version = "0.1.0"
+edition = "2021"
+authors = ["LongYinan <lynweklm@gmail.com>"]
+build = "build.rs"
+
+[lib]
+name = "bot_core"
+crate-type = ["cdylib"]
+
+[dependencies]
+napi = { version = "3.0.0", default-features = false }
+napi-derive = "3.0.0"
+rusqlite = { version = "0.31", features = ["bundled"] }
+
+[build-dependencies]
+napi-build = "2"
+
+[profile.dev]
+debug = true
+opt-level = 0
+incremental = true
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+strip = "symbols"
+incremental = false

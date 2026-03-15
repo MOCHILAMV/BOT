@@ -70,13 +70,13 @@ function requireNative() {
   } else if (process.platform === 'android') {
     if (process.arch === 'arm64') {
       try {
-        return require('./macros-engine.android-arm64.node')
+        return require('./bot-core.android-arm64.node')
       } catch (e) {
         loadErrors.push(e)
       }
       try {
-        const binding = require('macros-engine-android-arm64')
-        const bindingPackageVersion = require('macros-engine-android-arm64/package.json').version
+        const binding = require('bot-core-android-arm64')
+        const bindingPackageVersion = require('bot-core-android-arm64/package.json').version
         if (bindingPackageVersion !== '1.0.0' && process.env.NAPI_RS_ENFORCE_VERSION_CHECK && process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== '0') {
           throw new Error(`Native binding package version mismatch, expected 1.0.0 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`)
         }
@@ -86,13 +86,13 @@ function requireNative() {
       }
     } else if (process.arch === 'arm') {
       try {
-        return require('./macros-engine.android-arm-eabi.node')
+        return require('./bot-core.android-arm-eabi.node')
       } catch (e) {
         loadErrors.push(e)
       }
       try {
-        const binding = require('macros-engine-android-arm-eabi')
-        const bindingPackageVersion = require('macros-engine-android-arm-eabi/package.json').version
+        const binding = require('bot-core-android-arm-eabi')
+        const bindingPackageVersion = require('bot-core-android-arm-eabi/package.json').version
         if (bindingPackageVersion !== '1.0.0' && process.env.NAPI_RS_ENFORCE_VERSION_CHECK && process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== '0') {
           throw new Error(`Native binding package version mismatch, expected 1.0.0 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`)
         }
@@ -107,13 +107,13 @@ function requireNative() {
     if (process.arch === 'x64') {
       if (process.config?.variables?.shlib_suffix === 'dll.a' || process.config?.variables?.node_target_type === 'shared_library') {
         try {
-        return require('./macros-engine.win32-x64-gnu.node')
+        return require('./bot-core.win32-x64-gnu.node')
       } catch (e) {
         loadErrors.push(e)
       }
       try {
-        const binding = require('macros-engine-win32-x64-gnu')
-        const bindingPackageVersion = require('macros-engine-win32-x64-gnu/package.json').version
+        const binding = require('bot-core-win32-x64-gnu')
+        const bindingPackageVersion = require('bot-core-win32-x64-gnu/package.json').version
         if (bindingPackageVersion !== '1.0.0' && process.env.NAPI_RS_ENFORCE_VERSION_CHECK && process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== '0') {
           throw new Error(`Native binding package version mismatch, expected 1.0.0 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`)
         }
@@ -123,13 +123,13 @@ function requireNative() {
       }
       } else {
         try {
-        return require('./macros-engine.win32-x64-msvc.node')
+        return require('./bot-core.win32-x64-msvc.node')
       } catch (e) {
         loadErrors.push(e)
       }
       try {
-        const binding = require('macros-engine-win32-x64-msvc')
-        const bindingPackageVersion = require('macros-engine-win32-x64-msvc/package.json').version
+        const binding = require('bot-core-win32-x64-msvc')
+        const bindingPackageVersion = require('bot-core-win32-x64-msvc/package.json').version
         if (bindingPackageVersion !== '1.0.0' && process.env.NAPI_RS_ENFORCE_VERSION_CHECK && process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== '0') {
           throw new Error(`Native binding package version mismatch, expected 1.0.0 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`)
         }
@@ -140,13 +140,13 @@ function requireNative() {
       }
     } else if (process.arch === 'ia32') {
       try {
-        return require('./macros-engine.win32-ia32-msvc.node')
+        return require('./bot-core.win32-ia32-msvc.node')
       } catch (e) {
         loadErrors.push(e)
       }
       try {
-        const binding = require('macros-engine-win32-ia32-msvc')
-        const bindingPackageVersion = require('macros-engine-win32-ia32-msvc/package.json').version
+        const binding = require('bot-core-win32-ia32-msvc')
+        const bindingPackageVersion = require('bot-core-win32-ia32-msvc/package.json').version
         if (bindingPackageVersion !== '1.0.0' && process.env.NAPI_RS_ENFORCE_VERSION_CHECK && process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== '0') {
           throw new Error(`Native binding package version mismatch, expected 1.0.0 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`)
         }
@@ -156,13 +156,13 @@ function requireNative() {
       }
     } else if (process.arch === 'arm64') {
       try {
-        return require('./macros-engine.win32-arm64-msvc.node')
+        return require('./bot-core.win32-arm64-msvc.node')
       } catch (e) {
         loadErrors.push(e)
       }
       try {
-        const binding = require('macros-engine-win32-arm64-msvc')
-        const bindingPackageVersion = require('macros-engine-win32-arm64-msvc/package.json').version
+        const binding = require('bot-core-win32-arm64-msvc')
+        const bindingPackageVersion = require('bot-core-win32-arm64-msvc/package.json').version
         if (bindingPackageVersion !== '1.0.0' && process.env.NAPI_RS_ENFORCE_VERSION_CHECK && process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== '0') {
           throw new Error(`Native binding package version mismatch, expected 1.0.0 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`)
         }
@@ -175,13 +175,13 @@ function requireNative() {
     }
   } else if (process.platform === 'darwin') {
     try {
-      return require('./macros-engine.darwin-universal.node')
+      return require('./bot-core.darwin-universal.node')
     } catch (e) {
       loadErrors.push(e)
     }
     try {
-      const binding = require('macros-engine-darwin-universal')
-      const bindingPackageVersion = require('macros-engine-darwin-universal/package.json').version
+      const binding = require('bot-core-darwin-universal')
+      const bindingPackageVersion = require('bot-core-darwin-universal/package.json').version
       if (bindingPackageVersion !== '1.0.0' && process.env.NAPI_RS_ENFORCE_VERSION_CHECK && process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== '0') {
         throw new Error(`Native binding package version mismatch, expected 1.0.0 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`)
       }
@@ -191,13 +191,13 @@ function requireNative() {
     }
     if (process.arch === 'x64') {
       try {
-        return require('./macros-engine.darwin-x64.node')
+        return require('./bot-core.darwin-x64.node')
       } catch (e) {
         loadErrors.push(e)
       }
       try {
-        const binding = require('macros-engine-darwin-x64')
-        const bindingPackageVersion = require('macros-engine-darwin-x64/package.json').version
+        const binding = require('bot-core-darwin-x64')
+        const bindingPackageVersion = require('bot-core-darwin-x64/package.json').version
         if (bindingPackageVersion !== '1.0.0' && process.env.NAPI_RS_ENFORCE_VERSION_CHECK && process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== '0') {
           throw new Error(`Native binding package version mismatch, expected 1.0.0 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`)
         }
@@ -207,13 +207,13 @@ function requireNative() {
       }
     } else if (process.arch === 'arm64') {
       try {
-        return require('./macros-engine.darwin-arm64.node')
+        return require('./bot-core.darwin-arm64.node')
       } catch (e) {
         loadErrors.push(e)
       }
       try {
-        const binding = require('macros-engine-darwin-arm64')
-        const bindingPackageVersion = require('macros-engine-darwin-arm64/package.json').version
+        const binding = require('bot-core-darwin-arm64')
+        const bindingPackageVersion = require('bot-core-darwin-arm64/package.json').version
         if (bindingPackageVersion !== '1.0.0' && process.env.NAPI_RS_ENFORCE_VERSION_CHECK && process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== '0') {
           throw new Error(`Native binding package version mismatch, expected 1.0.0 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`)
         }
@@ -227,13 +227,13 @@ function requireNative() {
   } else if (process.platform === 'freebsd') {
     if (process.arch === 'x64') {
       try {
-        return require('./macros-engine.freebsd-x64.node')
+        return require('./bot-core.freebsd-x64.node')
       } catch (e) {
         loadErrors.push(e)
       }
       try {
-        const binding = require('macros-engine-freebsd-x64')
-        const bindingPackageVersion = require('macros-engine-freebsd-x64/package.json').version
+        const binding = require('bot-core-freebsd-x64')
+        const bindingPackageVersion = require('bot-core-freebsd-x64/package.json').version
         if (bindingPackageVersion !== '1.0.0' && process.env.NAPI_RS_ENFORCE_VERSION_CHECK && process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== '0') {
           throw new Error(`Native binding package version mismatch, expected 1.0.0 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`)
         }
@@ -243,13 +243,13 @@ function requireNative() {
       }
     } else if (process.arch === 'arm64') {
       try {
-        return require('./macros-engine.freebsd-arm64.node')
+        return require('./bot-core.freebsd-arm64.node')
       } catch (e) {
         loadErrors.push(e)
       }
       try {
-        const binding = require('macros-engine-freebsd-arm64')
-        const bindingPackageVersion = require('macros-engine-freebsd-arm64/package.json').version
+        const binding = require('bot-core-freebsd-arm64')
+        const bindingPackageVersion = require('bot-core-freebsd-arm64/package.json').version
         if (bindingPackageVersion !== '1.0.0' && process.env.NAPI_RS_ENFORCE_VERSION_CHECK && process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== '0') {
           throw new Error(`Native binding package version mismatch, expected 1.0.0 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`)
         }
@@ -264,13 +264,13 @@ function requireNative() {
     if (process.arch === 'x64') {
       if (isMusl()) {
         try {
-          return require('./macros-engine.linux-x64-musl.node')
+          return require('./bot-core.linux-x64-musl.node')
         } catch (e) {
           loadErrors.push(e)
         }
         try {
-          const binding = require('macros-engine-linux-x64-musl')
-          const bindingPackageVersion = require('macros-engine-linux-x64-musl/package.json').version
+          const binding = require('bot-core-linux-x64-musl')
+          const bindingPackageVersion = require('bot-core-linux-x64-musl/package.json').version
           if (bindingPackageVersion !== '1.0.0' && process.env.NAPI_RS_ENFORCE_VERSION_CHECK && process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== '0') {
             throw new Error(`Native binding package version mismatch, expected 1.0.0 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`)
           }
@@ -280,13 +280,13 @@ function requireNative() {
         }
       } else {
         try {
-          return require('./macros-engine.linux-x64-gnu.node')
+          return require('./bot-core.linux-x64-gnu.node')
         } catch (e) {
           loadErrors.push(e)
         }
         try {
-          const binding = require('macros-engine-linux-x64-gnu')
-          const bindingPackageVersion = require('macros-engine-linux-x64-gnu/package.json').version
+          const binding = require('bot-core-linux-x64-gnu')
+          const bindingPackageVersion = require('bot-core-linux-x64-gnu/package.json').version
           if (bindingPackageVersion !== '1.0.0' && process.env.NAPI_RS_ENFORCE_VERSION_CHECK && process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== '0') {
             throw new Error(`Native binding package version mismatch, expected 1.0.0 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`)
           }
@@ -298,13 +298,13 @@ function requireNative() {
     } else if (process.arch === 'arm64') {
       if (isMusl()) {
         try {
-          return require('./macros-engine.linux-arm64-musl.node')
+          return require('./bot-core.linux-arm64-musl.node')
         } catch (e) {
           loadErrors.push(e)
         }
         try {
-          const binding = require('macros-engine-linux-arm64-musl')
-          const bindingPackageVersion = require('macros-engine-linux-arm64-musl/package.json').version
+          const binding = require('bot-core-linux-arm64-musl')
+          const bindingPackageVersion = require('bot-core-linux-arm64-musl/package.json').version
           if (bindingPackageVersion !== '1.0.0' && process.env.NAPI_RS_ENFORCE_VERSION_CHECK && process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== '0') {
             throw new Error(`Native binding package version mismatch, expected 1.0.0 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`)
           }
@@ -314,13 +314,13 @@ function requireNative() {
         }
       } else {
         try {
-          return require('./macros-engine.linux-arm64-gnu.node')
+          return require('./bot-core.linux-arm64-gnu.node')
         } catch (e) {
           loadErrors.push(e)
         }
         try {
-          const binding = require('macros-engine-linux-arm64-gnu')
-          const bindingPackageVersion = require('macros-engine-linux-arm64-gnu/package.json').version
+          const binding = require('bot-core-linux-arm64-gnu')
+          const bindingPackageVersion = require('bot-core-linux-arm64-gnu/package.json').version
           if (bindingPackageVersion !== '1.0.0' && process.env.NAPI_RS_ENFORCE_VERSION_CHECK && process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== '0') {
             throw new Error(`Native binding package version mismatch, expected 1.0.0 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`)
           }
@@ -332,13 +332,13 @@ function requireNative() {
     } else if (process.arch === 'arm') {
       if (isMusl()) {
         try {
-          return require('./macros-engine.linux-arm-musleabihf.node')
+          return require('./bot-core.linux-arm-musleabihf.node')
         } catch (e) {
           loadErrors.push(e)
         }
         try {
-          const binding = require('macros-engine-linux-arm-musleabihf')
-          const bindingPackageVersion = require('macros-engine-linux-arm-musleabihf/package.json').version
+          const binding = require('bot-core-linux-arm-musleabihf')
+          const bindingPackageVersion = require('bot-core-linux-arm-musleabihf/package.json').version
           if (bindingPackageVersion !== '1.0.0' && process.env.NAPI_RS_ENFORCE_VERSION_CHECK && process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== '0') {
             throw new Error(`Native binding package version mismatch, expected 1.0.0 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`)
           }
@@ -348,13 +348,13 @@ function requireNative() {
         }
       } else {
         try {
-          return require('./macros-engine.linux-arm-gnueabihf.node')
+          return require('./bot-core.linux-arm-gnueabihf.node')
         } catch (e) {
           loadErrors.push(e)
         }
         try {
-          const binding = require('macros-engine-linux-arm-gnueabihf')
-          const bindingPackageVersion = require('macros-engine-linux-arm-gnueabihf/package.json').version
+          const binding = require('bot-core-linux-arm-gnueabihf')
+          const bindingPackageVersion = require('bot-core-linux-arm-gnueabihf/package.json').version
           if (bindingPackageVersion !== '1.0.0' && process.env.NAPI_RS_ENFORCE_VERSION_CHECK && process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== '0') {
             throw new Error(`Native binding package version mismatch, expected 1.0.0 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`)
           }
@@ -366,13 +366,13 @@ function requireNative() {
     } else if (process.arch === 'loong64') {
       if (isMusl()) {
         try {
-          return require('./macros-engine.linux-loong64-musl.node')
+          return require('./bot-core.linux-loong64-musl.node')
         } catch (e) {
           loadErrors.push(e)
         }
         try {
-          const binding = require('macros-engine-linux-loong64-musl')
-          const bindingPackageVersion = require('macros-engine-linux-loong64-musl/package.json').version
+          const binding = require('bot-core-linux-loong64-musl')
+          const bindingPackageVersion = require('bot-core-linux-loong64-musl/package.json').version
           if (bindingPackageVersion !== '1.0.0' && process.env.NAPI_RS_ENFORCE_VERSION_CHECK && process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== '0') {
             throw new Error(`Native binding package version mismatch, expected 1.0.0 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`)
           }
@@ -382,13 +382,13 @@ function requireNative() {
         }
       } else {
         try {
-          return require('./macros-engine.linux-loong64-gnu.node')
+          return require('./bot-core.linux-loong64-gnu.node')
         } catch (e) {
           loadErrors.push(e)
         }
         try {
-          const binding = require('macros-engine-linux-loong64-gnu')
-          const bindingPackageVersion = require('macros-engine-linux-loong64-gnu/package.json').version
+          const binding = require('bot-core-linux-loong64-gnu')
+          const bindingPackageVersion = require('bot-core-linux-loong64-gnu/package.json').version
           if (bindingPackageVersion !== '1.0.0' && process.env.NAPI_RS_ENFORCE_VERSION_CHECK && process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== '0') {
             throw new Error(`Native binding package version mismatch, expected 1.0.0 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`)
           }
@@ -400,13 +400,13 @@ function requireNative() {
     } else if (process.arch === 'riscv64') {
       if (isMusl()) {
         try {
-          return require('./macros-engine.linux-riscv64-musl.node')
+          return require('./bot-core.linux-riscv64-musl.node')
         } catch (e) {
           loadErrors.push(e)
         }
         try {
-          const binding = require('macros-engine-linux-riscv64-musl')
-          const bindingPackageVersion = require('macros-engine-linux-riscv64-musl/package.json').version
+          const binding = require('bot-core-linux-riscv64-musl')
+          const bindingPackageVersion = require('bot-core-linux-riscv64-musl/package.json').version
           if (bindingPackageVersion !== '1.0.0' && process.env.NAPI_RS_ENFORCE_VERSION_CHECK && process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== '0') {
             throw new Error(`Native binding package version mismatch, expected 1.0.0 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`)
           }
@@ -416,13 +416,13 @@ function requireNative() {
         }
       } else {
         try {
-          return require('./macros-engine.linux-riscv64-gnu.node')
+          return require('./bot-core.linux-riscv64-gnu.node')
         } catch (e) {
           loadErrors.push(e)
         }
         try {
-          const binding = require('macros-engine-linux-riscv64-gnu')
-          const bindingPackageVersion = require('macros-engine-linux-riscv64-gnu/package.json').version
+          const binding = require('bot-core-linux-riscv64-gnu')
+          const bindingPackageVersion = require('bot-core-linux-riscv64-gnu/package.json').version
           if (bindingPackageVersion !== '1.0.0' && process.env.NAPI_RS_ENFORCE_VERSION_CHECK && process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== '0') {
             throw new Error(`Native binding package version mismatch, expected 1.0.0 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`)
           }
@@ -433,13 +433,13 @@ function requireNative() {
       }
     } else if (process.arch === 'ppc64') {
       try {
-        return require('./macros-engine.linux-ppc64-gnu.node')
+        return require('./bot-core.linux-ppc64-gnu.node')
       } catch (e) {
         loadErrors.push(e)
       }
       try {
-        const binding = require('macros-engine-linux-ppc64-gnu')
-        const bindingPackageVersion = require('macros-engine-linux-ppc64-gnu/package.json').version
+        const binding = require('bot-core-linux-ppc64-gnu')
+        const bindingPackageVersion = require('bot-core-linux-ppc64-gnu/package.json').version
         if (bindingPackageVersion !== '1.0.0' && process.env.NAPI_RS_ENFORCE_VERSION_CHECK && process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== '0') {
           throw new Error(`Native binding package version mismatch, expected 1.0.0 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`)
         }
@@ -449,13 +449,13 @@ function requireNative() {
       }
     } else if (process.arch === 's390x') {
       try {
-        return require('./macros-engine.linux-s390x-gnu.node')
+        return require('./bot-core.linux-s390x-gnu.node')
       } catch (e) {
         loadErrors.push(e)
       }
       try {
-        const binding = require('macros-engine-linux-s390x-gnu')
-        const bindingPackageVersion = require('macros-engine-linux-s390x-gnu/package.json').version
+        const binding = require('bot-core-linux-s390x-gnu')
+        const bindingPackageVersion = require('bot-core-linux-s390x-gnu/package.json').version
         if (bindingPackageVersion !== '1.0.0' && process.env.NAPI_RS_ENFORCE_VERSION_CHECK && process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== '0') {
           throw new Error(`Native binding package version mismatch, expected 1.0.0 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`)
         }
@@ -469,13 +469,13 @@ function requireNative() {
   } else if (process.platform === 'openharmony') {
     if (process.arch === 'arm64') {
       try {
-        return require('./macros-engine.openharmony-arm64.node')
+        return require('./bot-core.openharmony-arm64.node')
       } catch (e) {
         loadErrors.push(e)
       }
       try {
-        const binding = require('macros-engine-openharmony-arm64')
-        const bindingPackageVersion = require('macros-engine-openharmony-arm64/package.json').version
+        const binding = require('bot-core-openharmony-arm64')
+        const bindingPackageVersion = require('bot-core-openharmony-arm64/package.json').version
         if (bindingPackageVersion !== '1.0.0' && process.env.NAPI_RS_ENFORCE_VERSION_CHECK && process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== '0') {
           throw new Error(`Native binding package version mismatch, expected 1.0.0 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`)
         }
@@ -485,13 +485,13 @@ function requireNative() {
       }
     } else if (process.arch === 'x64') {
       try {
-        return require('./macros-engine.openharmony-x64.node')
+        return require('./bot-core.openharmony-x64.node')
       } catch (e) {
         loadErrors.push(e)
       }
       try {
-        const binding = require('macros-engine-openharmony-x64')
-        const bindingPackageVersion = require('macros-engine-openharmony-x64/package.json').version
+        const binding = require('bot-core-openharmony-x64')
+        const bindingPackageVersion = require('bot-core-openharmony-x64/package.json').version
         if (bindingPackageVersion !== '1.0.0' && process.env.NAPI_RS_ENFORCE_VERSION_CHECK && process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== '0') {
           throw new Error(`Native binding package version mismatch, expected 1.0.0 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`)
         }
@@ -501,13 +501,13 @@ function requireNative() {
       }
     } else if (process.arch === 'arm') {
       try {
-        return require('./macros-engine.openharmony-arm.node')
+        return require('./bot-core.openharmony-arm.node')
       } catch (e) {
         loadErrors.push(e)
       }
       try {
-        const binding = require('macros-engine-openharmony-arm')
-        const bindingPackageVersion = require('macros-engine-openharmony-arm/package.json').version
+        const binding = require('bot-core-openharmony-arm')
+        const bindingPackageVersion = require('bot-core-openharmony-arm/package.json').version
         if (bindingPackageVersion !== '1.0.0' && process.env.NAPI_RS_ENFORCE_VERSION_CHECK && process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== '0') {
           throw new Error(`Native binding package version mismatch, expected 1.0.0 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`)
         }
@@ -529,7 +529,7 @@ if (!nativeBinding || process.env.NAPI_RS_FORCE_WASI) {
   let wasiBinding = null
   let wasiBindingError = null
   try {
-    wasiBinding = require('./macros-engine.wasi.cjs')
+    wasiBinding = require('./bot-core.wasi.cjs')
     nativeBinding = wasiBinding
   } catch (err) {
     if (process.env.NAPI_RS_FORCE_WASI) {
@@ -538,7 +538,7 @@ if (!nativeBinding || process.env.NAPI_RS_FORCE_WASI) {
   }
   if (!nativeBinding || process.env.NAPI_RS_FORCE_WASI) {
     try {
-      wasiBinding = require('macros-engine-wasm32-wasi')
+      wasiBinding = require('bot-core-wasm32-wasi')
       nativeBinding = wasiBinding
     } catch (err) {
       if (process.env.NAPI_RS_FORCE_WASI) {
@@ -577,3 +577,4 @@ if (!nativeBinding) {
 
 module.exports = nativeBinding
 module.exports.MacroEngine = nativeBinding.MacroEngine
+module.exports.TaskManager = nativeBinding.TaskManager
