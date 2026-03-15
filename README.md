@@ -3,7 +3,7 @@
 - O bot usa bibliotecas Mineflayer no JS.
 - Usa Rust para macros e SQlite para data.
 
-## Instalação §
+## Instalação
 
 ¹ Instale pacotes do `nodejs` e `rust`.
 
@@ -19,7 +19,7 @@ npm install
 npm run build
 ```
 
-## Configuração *
+## Configuração 
 
 - Use um editor de texto para criar o `.env`:
 
@@ -29,7 +29,7 @@ npm run build
   PORT=porta (padrão? 25565).
   VERSION=1.19.4 (melhor vers).
 
-## Macros $
+## Macros 
 
 - macro <add|del|list> nome exe
 
@@ -45,7 +45,7 @@ npm run build
 
  = executa o comando da {tp}!
 
-### Leave & Enter ¢
+### Leave & Enter 
 
 - No cmd: > `c`
 
@@ -55,4 +55,6 @@ npm run build
 
  = encerra totalmente o bot.
 
-#### Faz o L
+#### F
+
+Mais novidades em breve
