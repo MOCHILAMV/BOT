@@ -5,29 +5,37 @@ const cmd = require('./cmd')
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
+const EMAIL = process.env.EMAIL
+const NAME = process.env.NAME
+
 const OPT = {
   host: process.env.IP,
   port: Number.parseInt(process.env.PORT, 10),
   version: process.env.VERSION,
   checkTimeoutInterval: 100000,
-  viewDistance: 0
+  viewDistance: 0,
+  username: EMAIL || NAME
 }
 
-const EMAIL = process.env.EMAIL
-const PASSWORD = process.env.PASSWORD
-const NAME = process.env.NAME
-const PASS = process.env.PASS
-
 if (EMAIL) {
-  OPT.username = EMAIL
   OPT.auth = 'microsoft'
-} else {
-  OPT.username = NAME
 }
 
 let bot = null
 let reconnectTimer = null
 let watchdogInterval = null
+
+function relay(text, error = false) {
+  if (error) {
+    console.error(text)
+  } else {
+    console.log(text)
+  }
+
+  try {
+    cmd.serverLog(text)
+  } catch {}
+}
 
 function clearWatchdog() {
   if (!watchdogInterval) return
@@ -35,26 +43,33 @@ function clearWatchdog() {
   watchdogInterval = null
 }
 
+function clearReconnect() {
+  if (!reconnectTimer) return
+  clearTimeout(reconnectTimer)
+  reconnectTimer = null
+}
+
 function destroyBot() {
-  if (!bot) return
+  const instance = bot
+  bot = null
+
+  if (!instance) return
 
   try {
-    bot.quit()
+    instance.quit()
   } catch {}
-
-  bot = null
 }
 
 function safeRestart(delay = 5000) {
   if (reconnectTimer) return
 
-  clearWatchdog()
-  destroyBot()
-
   reconnectTimer = setTimeout(() => {
     reconnectTimer = null
     startBot()
   }, delay)
+
+  clearWatchdog()
+  destroyBot()
 }
 
 function setupWatchdog() {
@@ -65,7 +80,7 @@ function setupWatchdog() {
   watchdogInterval = setInterval(() => {
     const now = Date.now()
 
-    if (now - last - 1000 > 2000) {
+    if (now - last > 3000) {
       safeRestart(2000)
       return
     }
@@ -78,10 +93,7 @@ function setupMessageLogger(instance) {
   instance.on('message', jsonMsg => {
     try {
       const msg = jsonMsg.toAnsi()
-
-      if (msg && msg.trim()) {
-        cmd.serverLog(msg)
-      }
+      if (msg && msg.trim()) cmd.serverLog(msg)
     } catch {}
   })
 }
@@ -89,63 +101,25 @@ function setupMessageLogger(instance) {
 function setupErrorHandlers(instance) {
   instance.on('error', e => {
     const txt = `Erro: ${e && e.message ? e.message : String(e)}`
-    console.error(txt)
-
-    try {
-      cmd.serverLog(txt)
-    } catch {}
+    relay(txt, true)
   })
 
   instance.on('end', reason => {
     const txt = `Fim: ${reason}`
-    console.log(txt)
+    relay(txt)
 
-    try {
-      cmd.serverLog(txt)
-    } catch {}
-
+    if (instance !== bot) return
     safeRestart()
   })
 }
 
-async function reapplyPhysics(instance, delay = 250) {
-  await sleep(delay)
-
-  if (!bot || instance !== bot) return
-
-  try {
-    instance.physicsEnabled = true
-  } catch {}
-
-  try {
-    instance.clearControlStates()
-  } catch {}
-
-  try {
-    instance.setControlState('jump', false)
-    instance.setControlState('forward', false)
-    instance.setControlState('back', false)
-    instance.setControlState('left', false)
-    instance.setControlState('right', false)
-    instance.setControlState('sprint', false)
-  } catch {}
-}
-
 async function handleSpawn(instance) {
-  await reapplyPhysics(instance, 250)
   await sleep(500)
+
+  if (instance !== bot) return
 
   cmd.attachBot(instance)
   setupMessageLogger(instance)
-
-  if (!EMAIL && PASS) {
-    await sleep(100)
-
-    try {
-      instance.chat(`/login ${PASS}`)
-    } catch {}
-  }
-
   cmd.serverLog('BOT PRONTO.')
   setupWatchdog()
 }
@@ -156,30 +130,29 @@ function startBot() {
   const instance = mineflayer.createBot(OPT)
   bot = instance
 
+  setupErrorHandlers(instance)
+
   instance.once('spawn', async () => {
     try {
       await handleSpawn(instance)
     } catch (e) {
       const txt = `Erro no spawn: ${e && e.message ? e.message : String(e)}`
-      console.error(txt)
+      relay(txt, true)
 
-      try {
-        cmd.serverLog(txt)
-      } catch {}
-
+      if (instance !== bot) return
       safeRestart(2000)
     }
   })
-
-  instance.on('respawn', async () => {
-    try {
-      await reapplyPhysics(instance, 250)
-    } catch {}
-  })
-
-  setupErrorHandlers(instance)
 }
 
-process.on('SIGINT', () => process.exit(0))
+function shutdown() {
+  clearWatchdog()
+  clearReconnect()
+  destroyBot()
+  process.exit(0)
+}
+
+process.on('SIGINT', shutdown)
+process.on('SIGTERM', shutdown)
 
 startBot()
