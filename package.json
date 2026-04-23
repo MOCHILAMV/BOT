@@ -1,6 +1,6 @@
 {
   "name": "bot",
-  "version": "1.4.5",
+  "version": "1.4.9",
   "main": "bot.js",
   "scripts": {
     "start": "node bot.js"

@@ -13,7 +13,7 @@ module.exports = {
     const items = bot.inventory.items()
 
     if (!Array.isArray(items) || items.length === 0) {
-      log('vazio')
+      log('inventário vazio')
       return
     }
 

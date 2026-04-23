@@ -3,153 +3,170 @@ require('dotenv').config()
 const mineflayer = require('mineflayer')
 const cmd = require('./cmd')
 
-const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
-
-const EMAIL = process.env.EMAIL
-const NAME = process.env.NAME
+const sleep = ms => new Promise(r => setTimeout(r, ms))
 
 const OPT = {
   host: process.env.IP,
   port: Number.parseInt(process.env.PORT, 10),
   version: process.env.VERSION,
   checkTimeoutInterval: 100000,
-  viewDistance: 0,
-  username: EMAIL || NAME
+  viewDistance: 0
 }
 
-if (EMAIL) {
-  OPT.auth = 'microsoft'
+const EMAIL = process.env.EMAIL
+const NAME = process.env.NAME
+const PASS = process.env.PASS
+
+OPT.username = EMAIL || NAME
+if (EMAIL) OPT.auth = 'microsoft'
+
+const state = {
+  bot: null,
+  seq: 0,
+  activeSeq: 0,
+  shuttingDown: false,
+  failures: 0
 }
 
-let bot = null
 let reconnectTimer = null
-let watchdogInterval = null
 
-function relay(text, error = false) {
-  if (error) {
-    console.error(text)
-  } else {
-    console.log(text)
-  }
+function toText(v) {
+  if (v == null) return ''
+  if (typeof v === 'string') return v
+  if (typeof v !== 'object') return String(v)
 
   try {
-    cmd.serverLog(text)
-  } catch {}
+    return (
+      v.toAnsi?.() ||
+      v.text ||
+      v.reason ||
+      v.message ||
+      (Array.isArray(v.extra) ? v.extra.map(toText).join(' ') : v.extra) ||
+      JSON.stringify(v)
+    )
+  } catch {
+    return String(v)
+  }
 }
 
-function clearWatchdog() {
-  if (!watchdogInterval) return
-  clearInterval(watchdogInterval)
-  watchdogInterval = null
+const isCurrentBot = (b, s) =>
+  !state.shuttingDown && state.bot === b && state.activeSeq === s
+
+function detachBot() {
+  try { cmd.attachBot(null) } catch {}
 }
 
-function clearReconnect() {
+function destroyBot() {
+  const b = state.bot
+  state.bot = null
+  detachBot()
+  if (!b) return
+  try { b.quit() } catch {}
+}
+
+function clearReconnectTimer() {
   if (!reconnectTimer) return
   clearTimeout(reconnectTimer)
   reconnectTimer = null
 }
 
-function destroyBot() {
-  const instance = bot
-  bot = null
-
-  if (!instance) return
-
-  try {
-    instance.quit()
-  } catch {}
+function delayForFailure(n) {
+  return [0, 10000, 60000, 300000, 600000][n] ?? null
 }
 
-function safeRestart(delay = 5000) {
-  if (reconnectTimer) return
+function scheduleReconnect(reason) {
+  if (state.shuttingDown || reconnectTimer) return
+
+  state.failures++
+
+  if (state.failures > 4) {
+    const msg = `Falhou 5 vezes. Encerrando: ${reason || 'sem motivo'}`
+    console.error(msg)
+    try { cmd.serverLog(msg) } catch {}
+    return shutdown(1)
+  }
+
+  const delay = delayForFailure(state.failures)
+
+  try {
+    cmd.serverLog(`Reconectando em ${Math.ceil(delay / 1000)}s. Tentativa ${state.failures}/5.`)
+  } catch {}
+
+  destroyBot()
 
   reconnectTimer = setTimeout(() => {
     reconnectTimer = null
     startBot()
   }, delay)
-
-  clearWatchdog()
-  destroyBot()
 }
 
-function setupWatchdog() {
-  clearWatchdog()
+function setupMessageHandler(bot, seq) {
+  bot.on('message', msg => {
+    if (!isCurrentBot(bot, seq)) return
+    const text = msg?.toAnsi?.()
+    if (text?.trim()) cmd.serverLog(text)
+  })
+}
 
-  let last = Date.now()
+function setupLifecycleHandlers(bot, seq) {
+  bot.once('spawn', async () => {
+    if (!isCurrentBot(bot, seq)) return
 
-  watchdogInterval = setInterval(() => {
-    const now = Date.now()
+    state.failures = 0
+    clearReconnectTimer()
+    cmd.attachBot(bot)
 
-    if (now - last > 3000) {
-      safeRestart(2000)
-      return
+    await sleep(500)
+
+    if (!isCurrentBot(bot, seq)) return
+
+    if (!EMAIL && PASS) {
+      await sleep(150)
+      if (!isCurrentBot(bot, seq)) return
+      try { bot.chat(`/login ${PASS}`) } catch {}
     }
 
-    last = now
-  }, 1000)
-}
-
-function setupMessageLogger(instance) {
-  instance.on('message', jsonMsg => {
-    try {
-      const msg = jsonMsg.toAnsi()
-      if (msg && msg.trim()) cmd.serverLog(msg)
-    } catch {}
-  })
-}
-
-function setupErrorHandlers(instance) {
-  instance.on('error', e => {
-    const txt = `Erro: ${e && e.message ? e.message : String(e)}`
-    relay(txt, true)
+    cmd.serverLog('BOT PRONTO.')
   })
 
-  instance.on('end', reason => {
-    const txt = `Fim: ${reason}`
-    relay(txt)
+  const handleEnd = (type, data) => {
+    if (!isCurrentBot(bot, seq)) return
+    const text = toText(data) || 'sem motivo'
+    cmd.serverLog(`${type}: ${text}`)
+    scheduleReconnect(text)
+  }
 
-    if (instance !== bot) return
-    safeRestart()
-  })
-}
-
-async function handleSpawn(instance) {
-  await sleep(500)
-
-  if (instance !== bot) return
-
-  cmd.attachBot(instance)
-  setupMessageLogger(instance)
-  cmd.serverLog('BOT PRONTO.')
-  setupWatchdog()
+  bot.on('kicked', r => handleEnd('Kick', r))
+  bot.on('error', e => handleEnd('Erro', e?.message || e))
+  bot.on('end', r => handleEnd('Fim', r))
 }
 
 function startBot() {
-  if (bot) return
+  if (state.shuttingDown || state.bot) return
 
-  const instance = mineflayer.createBot(OPT)
-  bot = instance
+  clearReconnectTimer()
 
-  setupErrorHandlers(instance)
+  const seq = ++state.seq
+  state.activeSeq = seq
 
-  instance.once('spawn', async () => {
-    try {
-      await handleSpawn(instance)
-    } catch (e) {
-      const txt = `Erro no spawn: ${e && e.message ? e.message : String(e)}`
-      relay(txt, true)
+  let bot
+  try {
+    bot = mineflayer.createBot(OPT)
+  } catch (e) {
+    return scheduleReconnect(e?.message || String(e))
+  }
 
-      if (instance !== bot) return
-      safeRestart(2000)
-    }
-  })
+  state.bot = bot
+
+  setupMessageHandler(bot, seq)
+  setupLifecycleHandlers(bot, seq)
 }
 
-function shutdown() {
-  clearWatchdog()
-  clearReconnect()
+function shutdown(code = 0) {
+  state.shuttingDown = true
+  clearReconnectTimer()
   destroyBot()
-  process.exit(0)
+  process.exit(code)
 }
 
 process.on('SIGINT', shutdown)
