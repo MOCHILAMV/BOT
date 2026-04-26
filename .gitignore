@@ -1,0 +1,8 @@
+node_modules/
+data/
+.env
+macros.db
+tasks.db
+package-lock.json
+cmd/look.js
+cmd/pos.js
