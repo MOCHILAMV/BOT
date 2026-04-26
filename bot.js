@@ -36,14 +36,8 @@ function toText(v) {
   if (typeof v !== 'object') return String(v)
 
   try {
-    return (
-      v.toAnsi?.() ||
-      v.text ||
-      v.reason ||
-      v.message ||
-      (Array.isArray(v.extra) ? v.extra.map(toText).join(' ') : v.extra) ||
-      JSON.stringify(v)
-    )
+    const extra = Array.isArray(v.extra) ? v.extra.map(toText).join(' ') : v.extra
+    return v.toAnsi?.() || v.text || v.reason || v.message || extra || JSON.stringify(v)
   } catch {
     return String(v)
   }
@@ -52,14 +46,10 @@ function toText(v) {
 const isCurrentBot = (b, s) =>
   !state.shuttingDown && state.bot === b && state.activeSeq === s
 
-function detachBot() {
-  try { cmd.attachBot(null) } catch {}
-}
-
 function destroyBot() {
   const b = state.bot
   state.bot = null
-  detachBot()
+  try { cmd.attachBot(null) } catch {}
   if (!b) return
   try { b.quit() } catch {}
 }
@@ -100,15 +90,13 @@ function scheduleReconnect(reason) {
   }, delay)
 }
 
-function setupMessageHandler(bot, seq) {
+function setupBot(bot, seq) {
   bot.on('message', msg => {
     if (!isCurrentBot(bot, seq)) return
     const text = msg?.toAnsi?.()
     if (text?.trim()) cmd.serverLog(text)
   })
-}
 
-function setupLifecycleHandlers(bot, seq) {
   bot.once('spawn', async () => {
     if (!isCurrentBot(bot, seq)) return
 
@@ -157,9 +145,7 @@ function startBot() {
   }
 
   state.bot = bot
-
-  setupMessageHandler(bot, seq)
-  setupLifecycleHandlers(bot, seq)
+  setupBot(bot, seq)
 }
 
 function shutdown(code = 0) {
